@@ -26,27 +26,36 @@ jobs:
     environment:
       name: production
     steps:
-      - name: SonarQube Begin
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu' # Alternative distribution options are available.
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~\.sonar\cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache SonarQube scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@v4
+        with:
+          path: .\.sonar\scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+      - name: Install SonarQube scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: powershell
         run: |
-          export PATH="$PATH:$HOME/.dotnet/tools"
-          dotnet sonarscanner begin /k:"YourProjectKey" /d:sonar.host.url="http://localhost:9000" /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
-
-      - name: Build project
-        run: dotnet build YourSolution.sln
-
-      - name: SonarQube End
+          New-Item -Path .\.sonar\scanner -ItemType Directory
+          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+      - name: Build and analyze
+        shell: powershell
         run: |
-          export PATH="$PATH:$HOME/.dotnet/tools"
-          dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
-
-      - name: Run mock code quality scan
-        run: |
-          echo "🔎 รัน mock code quality scan..."
-          SCAN_RESULT="pass"
-          if [ "$SCAN_RESULT" != "pass" ]; then
-            echo "❌ Code quality scan ไม่ผ่าน! หยุด workflow"
-            exit 1
-          fi
-
-      - name: Deploy Step (รอ approve ก่อน)
-        run: echo "🚀 Deploying application..."
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"github-action" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
+          dotnet build
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
