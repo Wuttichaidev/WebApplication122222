@@ -9,11 +9,8 @@ jobs:
       - run: echo "🎉 งานถูกเรียกใช้งานโดยอัตโนมัติจากเหตุการณ์ ${{ github.event_name }}"
       - run: echo "🐧 งานนี้กำลังทำงานบนเซิร์ฟเวอร์ ${{ runner.os }} ที่โฮสต์โดย GitHub!"
       - run: echo "🔎 ชื่อสาขาของคุณคือ ${{ github.ref }} และที่เก็บข้อมูลของคุณคือ ${{ github.repository }}"
-
-      # Checkout repo
       - name: ตรวจสอบรหัสที่เก็บข้อมูล
         uses: actions/checkout@v4
-
       - run: echo "💡 รีพอริทอรี ${{ github.repository }} ได้ถูกโคลนไปยังรันเนอร์แล้ว"
       - run: echo "🖥️ เวิร์กโฟลว์พร้อมที่จะทดสอบโค้ดของคุณบนตัวรันเนอร์แล้ว"
       - name: รายชื่อไฟล์ในที่เก็บ
@@ -28,12 +25,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: 'zulu' # Alternative distribution options are available.
+          distribution: 'zulu'
       - name: Cache SonarQube packages
         uses: actions/cache@v4
         with:
@@ -53,16 +50,34 @@ jobs:
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+
       - name: Build and analyze
         shell: powershell
         run: |
+          # หยุด workflow เมื่อเจอ error
+          $ErrorActionPreference = "Stop"
           $env:SONAR_TOKEN="${{ secrets.SONAR_TOKEN }}"
+
+          # Begin SonarScanner
           .\.sonar\scanner\dotnet-sonarscanner begin `
-          /k:"github-action" `
-          /d:sonar.login=$env:SONAR_TOKEN `
-          /d:sonar.host.url=http://localhost:9000
+            /k:"github-action" `
+            /d:sonar.login=$env:SONAR_TOKEN `
+            /d:sonar.host.url=http://localhost:9000
+
+          # Build project (fail on warning/error)
           dotnet build /warnaserror
+
+          # End SonarScanner
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login=$env:SONAR_TOKEN
 
-    
+          # ตรวจ Quality Gate ผ่าน API
+          $projectKey = "github-action"
+          $server = "http://localhost:9000"
 
+          $status = (Invoke-RestMethod -Uri "$server/api/qualitygates/project_status?projectKey=$projectKey" `
+            -Headers @{Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("$env:SONAR_TOKEN:"))}).projectStatus.status
+
+          if ($status -ne "OK") {
+              Write-Error "❌ Quality Gate failed with status $status"
+              exit 1
+          }
