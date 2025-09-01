@@ -73,5 +73,6 @@ jobs:
            if ($status -ne "OK") {
             Write-Error "Quality Gate failed with status $status"
             exit 1
+          }
     
 
