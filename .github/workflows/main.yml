@@ -54,8 +54,24 @@ jobs:
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
       - name: Build and analyze
-        shell: powershell    
+        shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"github-action" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="http://localhost:9000"
-          dotnet build
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          $env:SONAR_TOKEN="${{ secrets.SONAR_TOKEN }}"
+          .\.sonar\scanner\dotnet-sonarscanner begin `
+          /k:"github-action" `
+          /d:sonar.login=$env:SONAR_TOKEN `
+          /d:sonar.host.url=http://localhost:9000
+          # Build project (fail on warning/error)
+          dotnet build /warnaserror
+          # End SonarScanner
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login=$env:SONAR_TOKEN
+          # ตรวจ Quality Gate ผ่าน API
+          $projectKey = "github-action"
+          $server = "http://localhost:9000"
+          $status = (Invoke-RestMethod -Uri "$server/api/qualitygates/project_status?projectKey=$projectKey" `
+          -Headers @{Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("$env:SONAR_TOKEN:"))}).projectStatus.status
+           if ($status -ne "OK") {
+            Write-Error "Quality Gate failed with status $status"
+            exit 1
+    
+
