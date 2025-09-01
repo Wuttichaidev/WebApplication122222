@@ -1,0 +1,52 @@
+﻿name: GitHub Actions Demo
+run-name: ${{ github.actor }} กำลังทดสอบ GitHub Actions 🚀
+on: [push]
+
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 งานถูกเรียกใช้งานโดยอัตโนมัติจากเหตุการณ์ ${{ github.event_name }}"
+      - run: echo "🐧 งานนี้กำลังทำงานบนเซิร์ฟเวอร์ ${{ runner.os }} ที่โฮสต์โดย GitHub!"
+      - run: echo "🔎 ชื่อสาขาของคุณคือ ${{ github.ref }} และที่เก็บข้อมูลของคุณคือ ${{ github.repository }}"
+
+      # Checkout repo
+      - name: ตรวจสอบรหัสที่เก็บข้อมูล
+        uses: actions/checkout@v4
+
+      - run: echo "💡 รีพอริทอรี ${{ github.repository }} ได้ถูกโคลนไปยังรันเนอร์แล้ว"
+      - run: echo "🖥️ เวิร์กโฟลว์พร้อมที่จะทดสอบโค้ดของคุณบนตัวรันเนอร์แล้ว"
+      - name: รายชื่อไฟล์ในที่เก็บ
+        run: |
+          ls ${{ github.workspace }}
+
+  deploy:
+    needs: Explore-GitHub-Actions
+    runs-on: self-hosted   # เปลี่ยนเป็น self-hosted runner ของคุณ
+    environment:
+      name: production
+    steps:
+      - name: SonarQube Begin
+        run: |
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          dotnet sonarscanner begin /k:"YourProjectKey" /d:sonar.host.url="http://localhost:9000" /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+
+      - name: Build project
+        run: dotnet build YourSolution.sln
+
+      - name: SonarQube End
+        run: |
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+
+      - name: Run mock code quality scan
+        run: |
+          echo "🔎 รัน mock code quality scan..."
+          SCAN_RESULT="pass"
+          if [ "$SCAN_RESULT" != "pass" ]; then
+            echo "❌ Code quality scan ไม่ผ่าน! หยุด workflow"
+            exit 1
+          fi
+
+      - name: Deploy Step (รอ approve ก่อน)
+        run: echo "🚀 Deploying application..."
