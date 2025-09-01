@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Xml.Linq;
 
 namespace WebApplication122222.Controllers
 {
@@ -23,8 +24,10 @@ namespace WebApplication122222.Controllers
         {
             try
             {
-
-            }catch(Exception ex)
+                var name = 123; 
+                "".Equals(name);
+            }
+            catch(Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while getting the weather forecast.");
             }
