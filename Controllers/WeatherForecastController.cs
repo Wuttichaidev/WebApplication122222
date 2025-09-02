@@ -26,6 +26,7 @@ namespace WebApplication122222.Controllers
             {
                 var name = 123; 
                 "".Equals(name);
+                var test = "";
             }
             catch(Exception ex)
             {
