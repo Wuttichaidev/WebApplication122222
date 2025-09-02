@@ -14,10 +14,23 @@ namespace WebApplication122222.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
+        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        {
+            _logger = logger;
+        }
 
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
+            try
+            {
+                var name = 123; 
+                "".Equals(name);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while getting the weather forecast.");
+            }
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             { 
             Date = DateTime.Now.AddDays(index),
