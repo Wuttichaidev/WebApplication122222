@@ -80,7 +80,7 @@ jobs:
           setlocal enabledelayedexpansion
           set STATUS=NOT_FOUND
 
-          for /F "tokens=2 delims=:" %%a in ('findstr /C:"\"status\"" result.json') do (
+          for /F "tokens=2 delims=:" %%a in ('findstr status result.json') do (
               set STATUS=%%a
               set STATUS=!STATUS: =!
               set STATUS=!STATUS:"=!
