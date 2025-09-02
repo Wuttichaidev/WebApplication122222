@@ -50,7 +50,6 @@ jobs:
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
-      - run: echo "${{ secrets.SONAR_TOKEN }}"
       - name: Build and analyze
         shell: cmd
         run: |
@@ -58,7 +57,7 @@ jobs:
           set SONAR_TOKEN=%SONAR_TOKEN%
 
           REM เรียก API ตรวจสอบ token ก่อน
-          curl -u %SONAR_TOKEN%: http://localhost:9000/api/authentication/validate
+          curl -u "${{ secrets.SONAR_TOKEN }}:" http://localhost:9000/api/authentication/validate
 
           REM ตรวจสอบ Quality Gate
           curl -s -u %SONAR_TOKEN%: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
