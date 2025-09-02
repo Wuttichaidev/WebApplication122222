@@ -53,6 +53,7 @@ jobs:
       - name: Build and analyze
         shell: cmd
         run: |
+          echo {} > result.json
           REM เรียก API ตรวจสอบ token ก่อน
           curl -u ${{ secrets.SONAR_TOKEN }}: http://localhost:9000/api/authentication/validate
 
@@ -68,9 +69,28 @@ jobs:
           REM จบ scan
           dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
           
-          REM ลบไฟล์เก่า 
-          curl -s -u ${{ secrets.SONAR_TOKEN }}: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
+          
+          
 
+          if not exist "%FILE%" echo {} > "%FILE%"
+          set RETRIES=3
+          set /a COUNT=0
+          
+          :retry
+          curl -s -u ${{ secrets.SONAR_TOKEN }}: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
+          if %ERRORLEVEL%==0 (
+              echo Curl succeeded
+          ) else (
+              set /a COUNT+=1
+              if %COUNT% lss %RETRIES% (
+                  echo Curl failed, retry %COUNT%/%RETRIES%
+                  timeout /t 5 > nul
+                  goto retry
+              ) else (
+                  echo Curl failed after %RETRIES% attempts
+                  exit /b 1
+              )
+          )
 
           if not exist  result.json {
             curl -s -u ${{ secrets.SONAR_TOKEN }}: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
