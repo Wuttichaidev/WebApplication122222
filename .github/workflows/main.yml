@@ -53,6 +53,8 @@ jobs:
       - name: Build and analyze
         shell: cmd
         run: |
+          echo %SONAR_TOKEN%
+          echo ${{ secrets.SONAR_TOKEN }}
           REM เรียก API ตรวจสอบ token ก่อน
           curl -u ${{ secrets.SONAR_TOKEN }}: http://localhost:9000/api/authentication/validate
 
