@@ -18,7 +18,7 @@ jobs:
           ls ${{ github.workspace }} 
 
   deploy:
-    needs: Explore-GitHub-Actions
+    needs: Explore-GitHub-Actions 
     runs-on: self-hosted   # เปลี่ยนเป็น self-hosted runner ของคุณ
     environment:
       name: production
