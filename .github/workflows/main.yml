@@ -74,7 +74,28 @@ jobs:
 
           REM อ่าน status จากไฟล์ JSON
           findstr /C:"\"status\"" result.json
+      - name: Read status from result.json
+        shell: cmd
+        run: |
+          setlocal enabledelayedexpansion
+          set STATUS=NOT_FOUND
 
+          for /F "tokens=2 delims=:" %%a in ('findstr /C:"\"status\"" result.json') do (
+              set STATUS=%%a
+              set STATUS=!STATUS: =!
+              set STATUS=!STATUS:"=!
+              goto afterLoop
+          )
+
+          :afterLoop
+          echo Project Status = !STATUS!
+
+          if "!STATUS!"=="OK" (
+              echo Quality Gate PASSED
+          ) else (
+              echo Quality Gate FAILED
+              exit /b 1
+          )
           
           
           
