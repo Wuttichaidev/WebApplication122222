@@ -53,8 +53,7 @@ jobs:
       - name: Build and analyze
         shell: cmd
         run: |
-          echo %SONAR_TOKEN%
-          echo ${{ secrets.SONAR_TOKEN }}
+
           REM เรียก API ตรวจสอบ token ก่อน
           curl -u ${{ secrets.SONAR_TOKEN }}: http://localhost:9000/api/authentication/validate
 
@@ -63,5 +62,13 @@ jobs:
 
           REM อ่าน status จากไฟล์ JSON
           findstr /C:"\"status\"" result.json
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+          REM เริ่ม scan
+          dotnet-sonarscanner begin /k:"github-action" /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.host.url=http://localhost:9000
+
+          REM Build project
+          dotnet build /warnaserror
+
+          REM จบ scan
+          dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
+
