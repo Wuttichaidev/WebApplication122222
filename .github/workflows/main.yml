@@ -79,9 +79,7 @@ jobs:
               Write-Host "Curl failed, creating empty result.json"
               '{}' | Out-File result.json
          }
-
-          REM อ่าน status จากไฟล์ JSON
-          findstr /C:"\"status\"" result.json
+         findstr /C:"\"status\"" result.json
           
       - name: Read status from result.json
         shell: cmd
