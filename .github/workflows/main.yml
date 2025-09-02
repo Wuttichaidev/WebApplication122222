@@ -71,7 +71,7 @@ jobs:
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login=$env:SONAR_TOKEN
 
           # ตรวจ Quality Gate ผ่าน API 
-          $projectKey = ${{ github.repository }}
+          $projectKey = "github-action"
           $server = "http://localhost:9000"
 
           $status = (Invoke-RestMethod -Uri "$server/api/qualitygates/project_status?projectKey=$projectKey" `
