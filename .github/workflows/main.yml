@@ -70,14 +70,21 @@ jobs:
           # End SonarScanner
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login=$env:SONAR_TOKEN
 
-          # ตรวจ Quality Gate ผ่าน API 
+          $token = $env:SONAR_TOKEN
           $projectKey = "github-action"
-          $server = "http://localhost:9000"
+          $encodedProjectKey = [System.Web.HttpUtility]::UrlEncode($projectKey)
 
-          $status = (Invoke-RestMethod -Uri "$server/api/qualitygates/project_status?projectKey=$projectKey" `
-            -Headers @{Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("$env:SONAR_TOKEN:"))}).projectStatus.status
+          $headers = @{
+            Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("$token:"))
+          }
+
+          $response = Invoke-RestMethod -Uri "$server/api/qualitygates/project_status?projectKey=$encodedProjectKey" -Headers $headers
+
+          $status = $response.projectStatus.status
 
           if ($status -ne "OK") {
-              Write-Error "❌ Quality Gate failed with status $status"
-              exit 1
+            Write-Error "❌ Quality Gate failed with status $status"
+          exit 1
+          } else {
+            Write-Output "✅ Quality Gate passed"
           }
