@@ -23,19 +23,7 @@ namespace WebApplication122222.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
-            try 
-            {
-                var name = 123;
-                "".Equals(name);
-                var test = "";
-                var test2 = "";
-                OpenApiString openApiString = new OpenApiString("test"); // Fixed CS0029
-                AnyType anyType = openApiString.AnyType; // If you need the AnyType value 
-            }
-            catch (Exception ex) 
-            {
-                _logger.LogError(ex, "An error occurred while getting the weather forecast.");
-            }
+           
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
