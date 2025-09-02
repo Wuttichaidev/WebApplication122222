@@ -71,6 +71,18 @@ jobs:
 
           REM Build project
           dotnet build /warnaserror
-
+          
           REM จบ scan
           dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
+
+          for /F "tokens=2 delims=:" %%a in ('findstr /C:"\"status\"" result.json') do ( 
+            set STATUS=%%a
+          )
+          set STATUS=%STATUS:~1,2%
+
+          if NOT "%STATUS%"=="OK" (
+              echo ❌ Quality Gate failed with status %STATUS%
+              exit /b 1
+          ) else (
+              echo ✅ Quality Gate passed
+          )
