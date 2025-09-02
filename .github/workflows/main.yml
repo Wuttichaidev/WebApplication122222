@@ -76,8 +76,7 @@ jobs:
           dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
           REM อ่านค่า status จาก result.json
-          for /F "tokens=2 delims=:" %a in ('findstr /C:"status" result.json') do set STATUS=%a
-          for /F "tokens=2 delims=:," %a in ('findstr /C:"status" "%GITHUB_WORKSPACE%\WebApplication122222\data.json"') do (
+          for /F "tokens=2 delims=:," %a in ('findstr /C:"status" "%GITHUB_WORKSPACE%\WebApplication122222\result.json"') do (
           set STATUS=%a
           )
           echo "{{STATUS}}"
