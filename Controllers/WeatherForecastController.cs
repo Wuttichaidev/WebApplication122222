@@ -32,7 +32,7 @@ namespace WebApplication122222.Controllers
                 OpenApiString openApiString = new OpenApiString("test"); // Fixed CS0029
                 AnyType anyType = openApiString.AnyType; // If you need the AnyType value 
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
                 _logger.LogError(ex, "An error occurred while getting the weather forecast.");
             }
