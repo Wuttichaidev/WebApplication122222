@@ -75,22 +75,4 @@ jobs:
           REM จบ scan
           dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
-      - name: Read projectStatus from JSON
-        shell: pwsh
-        run: |
-          $jsonPath = "$env:GITHUB_WORKSPACE\WebApplication122222\result.json"
-          $json = Get-Content $jsonPath | ConvertFrom-Json
-
-          # ดึงค่าหลัก
-          $projectStatus = $json.projectStatus.status
-          Write-Host "Project Status: $projectStatus"
-      
-          # ดึงค่า conditions[0].status
-          $conditionStatus = $json.projectStatus.conditions[0].status
-          Write-Host "Condition[0] Status: $conditionStatus"
-      
-          # ดึงค่าอื่น ๆ เช่น caycStatus
-          $caycStatus = $json.projectStatus.caycStatus
-          Write-Host "CAYC Status: $caycStatus"
-          
           
