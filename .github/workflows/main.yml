@@ -74,5 +74,5 @@ jobs:
           
           REM จบ scan
           dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
-
+          
           
