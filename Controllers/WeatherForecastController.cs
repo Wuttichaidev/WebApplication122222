@@ -30,7 +30,7 @@ namespace WebApplication122222.Controllers
                 var test = "";
                 var test2 = "";
                 OpenApiString openApiString = new OpenApiString("test"); // Fixed CS0029
-                AnyType anyType = openApiString.AnyType; // If you need the AnyType value
+                AnyType anyType = openApiString.AnyType; // If you need the AnyType value 
             }
             catch (Exception ex)
             {
