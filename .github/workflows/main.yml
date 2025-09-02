@@ -78,11 +78,12 @@ jobs:
         shell: cmd
         run: |
           REM อ่านไฟล์ JSON และตรวจสอบ projectStatus.status
-          for /f "delims=" %%i in (status.json) do set "json_content=%%i"
+          for /f "delims=" %%i in (result.json) do set "json_content=%%i"
           echo Checking projectStatus...
           
           REM ตรวจสอบว่า projectStatus.status เป็น OK หรือไม่
           echo %json_content% | findstr /C:"\"projectStatus\":{\"status\":\"OK\"" >nul
+          echo 
           if %errorlevel% neq 0 (
               echo ❌ Project status is not OK! Stopping workflow...
               exit /b 1
