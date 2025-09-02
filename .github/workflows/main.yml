@@ -70,7 +70,7 @@ jobs:
           # End SonarScanner
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login=$env:SONAR_TOKEN
 
-          $token = $env:SONAR_TOKEN
+          $token = $secrets.SONAR_TOKEN
           $projectKey = "github-action"
           $encodedProjectKey = [System.Web.HttpUtility]::UrlEncode($projectKey)
 
