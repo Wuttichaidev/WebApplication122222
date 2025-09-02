@@ -70,15 +70,10 @@ jobs:
           
 
       - name: Genarate json file
-        shell: powershell
+        shell: cmd
         run: | 
-         try{
           curl -s -u ${{ secrets.SONAR_TOKEN }}: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
-         } catch {
-              Write-Host "Curl failed, creating empty result.json"
-              '{}' | Out-File result.json
-         }
-         findstr /C:"\"status\"" result.json
+          findstr /C:"\"status\"" result.json
           
       - name: Read status from result.json
         shell: cmd
