@@ -69,11 +69,12 @@ jobs:
           REM จบ scan
           dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
-          curl -s -u ${{ secrets.SONAR_TOKEN }}: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
+         
           echo Waiting for SonarQube analysis to complete...     
           REM retry ครั้งละ 10 วินาที รวม 5 ครั้ง (50 วินาที)
           set retry_count=0
           set max_retries=5
+           curl -s -u ${{ secrets.SONAR_TOKEN }}: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
           
           :retry_loop
           set /a retry_count+=1
