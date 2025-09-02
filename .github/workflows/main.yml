@@ -83,7 +83,7 @@ jobs:
           
           REM ตรวจสอบว่า projectStatus.status เป็น OK หรือไม่
           echo %json_content% | findstr /C:"\"projectStatus\":{\"status\":\"OK\"" >nul
-          if %errorlevel% != 0 (
+          if %errorlevel% neq 0 (
               echo ❌ Project status is not OK! Stopping workflow...
               exit /b 1
           )
