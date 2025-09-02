@@ -53,13 +53,13 @@ jobs:
       - name: Build and analyze
         shell: cmd
         run: |
-          echo {} > result.json
+          
           REM เรียก API ตรวจสอบ token ก่อน
           curl -u ${{ secrets.SONAR_TOKEN }}: http://localhost:9000/api/authentication/validate
 
           REM เพิ่ม path ของ local scanner
           set PATH=.sonar\scanner;%PATH%
-
+          echo {} > result.json
           REM เริ่ม scan
           dotnet-sonarscanner begin /k:"github-action" /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.host.url=http://localhost:9000
 
@@ -69,29 +69,8 @@ jobs:
           REM จบ scan
           dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
           
-          
-          
 
-          if not exist "%FILE%" echo {} > "%FILE%"
-          set RETRIES=3
-          set /a COUNT=0
-          
-          :retry
           curl -s -u ${{ secrets.SONAR_TOKEN }}: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
-          if %ERRORLEVEL%==0 (
-              echo Curl succeeded
-          ) else (
-              set /a COUNT+=1
-              if %COUNT% lss %RETRIES% (
-                  echo Curl failed, retry %COUNT%/%RETRIES%
-                  timeout /t 5 > nul
-                  goto retry
-              ) else (
-                  echo Curl failed after %RETRIES% attempts
-                  exit /b 1
-              )
-          )
-
           if not exist  result.json {
             curl -s -u ${{ secrets.SONAR_TOKEN }}: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
           }
