@@ -70,7 +70,7 @@ jobs:
           # End SonarScanner
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login=$env:SONAR_TOKEN
 
-          # ตรวจ Quality Gate ผ่าน API
+          # ตรวจ Quality Gate ผ่าน API 
           $projectKey = ${{ github.repository }}
           $server = "http://localhost:9000"
 
