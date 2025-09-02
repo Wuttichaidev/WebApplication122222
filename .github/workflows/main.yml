@@ -57,12 +57,6 @@ jobs:
           REM เรียก API ตรวจสอบ token ก่อน
           curl -u ${{ secrets.SONAR_TOKEN }}: http://localhost:9000/api/authentication/validate
 
-          REM ตรวจสอบ Quality Gate
-          curl -s -u ${{ secrets.SONAR_TOKEN }}: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
-
-          REM อ่าน status จากไฟล์ JSON
-          findstr /C:"\"status\"" result.json
-
           REM เพิ่ม path ของ local scanner
           set PATH=.sonar\scanner;%PATH%
 
@@ -74,7 +68,13 @@ jobs:
           
           REM จบ scan
           dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
-      - run: echo findstr /C:"\"status\"" result.json
+
+          REM ตรวจสอบ Quality Gate
+          curl -s -u ${{ secrets.SONAR_TOKEN }}: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
+
+          REM อ่าน status จากไฟล์ JSON
+          findstr /C:"\"status\"" result.json
+
           
           
           
