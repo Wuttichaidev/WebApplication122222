@@ -23,7 +23,7 @@ namespace WebApplication122222.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
-            try
+            try 
             {
                 var name = 123;
                 "".Equals(name);
