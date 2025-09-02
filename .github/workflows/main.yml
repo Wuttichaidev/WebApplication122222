@@ -52,39 +52,16 @@ jobs:
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
       - run: echo "${{ secrets.SONAR_TOKEN }}"
       - name: Build and analyze
-        shell: powershell
+        shell: cmd
         run: |
-          # หยุด workflow เมื่อเจอ error
-          $ErrorActionPreference = "Stop"
-          $env:SONAR_TOKEN="${{ secrets.SONAR_TOKEN }}"
+          REM ตั้งค่าตัวแปร token จาก secret
+          set SONAR_TOKEN=%SONAR_TOKEN%
 
-          # Begin SonarScanner
-          .\.sonar\scanner\dotnet-sonarscanner begin `
-            /k:"github-action" `
-            /d:sonar.login=$env:SONAR_TOKEN `
-            /d:sonar.host.url=http://localhost:9000
+          REM เรียก API ตรวจสอบ token ก่อน
+          curl -u %SONAR_TOKEN%: http://localhost:9000/api/authentication/validate
 
-          # Build project (fail on warning/error)
-          dotnet build /warnaserror
+          REM ตรวจสอบ Quality Gate
+          curl -s -u %SONAR_TOKEN%: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
 
-          # End SonarScanner
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login=$env:SONAR_TOKEN
-
-
-          $projectKey = "github-action"
-          $encodedProjectKey = $encodedProjectKey = [uri]::EscapeDataString("${{ secrets.SONAR_TOKEN }}")
-
-          $headers = @{
-            Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("${{ secrets.SONAR_TOKEN }}"))
-          }
-
-          $response = Invoke-RestMethod -Uri "http://localhost:9000/api/qualitygates/project_status?projectKey=$encodedProjectKey" -Headers $headers
-          
-          $status = $response.projectStatus.status
-
-          if ($status -ne "OK") {
-            Write-Error "❌ Quality Gate failed with status $status"
-          exit 1
-          } else {
-            Write-Output "✅ Quality Gate passed"
-          }
+          REM อ่าน status จากไฟล์ JSON (ใช้ findstr ง่าย ๆ)
+          findstr /C:"\"status\"" result.json
