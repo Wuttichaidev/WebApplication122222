@@ -75,17 +75,17 @@ jobs:
           REM จบ scan
           dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
-          REM อ่าน status จาก JSON ด้วย findstr และ for /F
+          REM อ่านค่า status จาก result.json
           for /F "tokens=2 delims=:" %a in ('findstr /C:"status" result.json') do set STATUS=%a
 
           REM ลบ space และ double quote
           set STATUS=%STATUS: =%
           set STATUS=%STATUS:"=%
 
-          REM ตรวจสอบค่า
+          REM ตรวจสอบค่า status และ fail workflow ถ้าไม่ OK
           if NOT "%STATUS%"=="OK" (
-           echo ❌ Quality Gate failed with status %STATUS%
+              echo ❌ Quality Gate failed with status %STATUS%
           exit /b 1
           ) else (
-          echo ✅ Quality Gate passed
+            echo ✅ Quality Gate passed
           )
