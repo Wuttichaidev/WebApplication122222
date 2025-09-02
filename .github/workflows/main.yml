@@ -69,7 +69,7 @@ jobs:
           dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
           
           REM ลบไฟล์เก่า 
-          SONAR_TOKEN }}: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
+          curl -s -u ${{ secrets.SONAR_TOKEN }}: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
 
           REM อ่าน status จากไฟล์ JSON
           findstr /C:"\"status\"" result.json
