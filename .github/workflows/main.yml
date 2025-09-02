@@ -53,7 +53,6 @@ jobs:
       - name: Build and analyze
         shell: cmd
         run: |
-
           REM เรียก API ตรวจสอบ token ก่อน
           curl -u ${{ secrets.SONAR_TOKEN }}: http://localhost:9000/api/authentication/validate
 
@@ -70,7 +69,6 @@ jobs:
           dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
           
           REM ลบไฟล์เก่า 
-          if exist result.json del result.json
           SONAR_TOKEN }}: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
 
           REM อ่าน status จากไฟล์ JSON
