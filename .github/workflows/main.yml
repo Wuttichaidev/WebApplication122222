@@ -63,4 +63,5 @@ jobs:
 
           REM อ่าน status จากไฟล์ JSON
           findstr /C:"\"status\"" result.json
-
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
