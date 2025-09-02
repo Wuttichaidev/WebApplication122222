@@ -63,6 +63,9 @@ jobs:
           REM อ่าน status จากไฟล์ JSON
           findstr /C:"\"status\"" result.json
 
+          REM เพิ่ม path ของ local scanner
+          set PATH=.sonar\scanner;%PATH%
+
           REM เริ่ม scan
           dotnet-sonarscanner begin /k:"github-action" /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.host.url=http://localhost:9000
 
@@ -71,4 +74,3 @@ jobs:
 
           REM จบ scan
           dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
-
