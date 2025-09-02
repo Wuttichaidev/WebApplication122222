@@ -70,12 +70,12 @@ jobs:
           # End SonarScanner
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login=$env:SONAR_TOKEN
 
-          $token = $secrets.SONAR_TOKEN
+
           $projectKey = "github-action"
           $encodedProjectKey = [System.Web.HttpUtility]::UrlEncode($projectKey)
 
           $headers = @{
-            Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("$token:"))
+            Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("${{ secrets.SONAR_TOKEN }}"))
           }
 
           $response = Invoke-RestMethod -Uri "$server/api/qualitygates/project_status?projectKey=$encodedProjectKey" -Headers $headers
