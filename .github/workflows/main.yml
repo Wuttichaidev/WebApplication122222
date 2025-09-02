@@ -75,14 +75,12 @@ jobs:
           REM จบ scan
           dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
-          REM อ่าน status จาก JSON
-          for /F "tokens=2 delims=:" %a in ('findstr /C:"\"status\"" result.json') do set STATUS=%a
-          set STATUS=%STATUS:~1,2%
+          # ตรวจสอบ Quality Gate
+          $result = Invoke-RestMethod -Uri "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" -Headers @{ Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("$env:SONAR_TOKEN:")) }
 
-          REM ตรวจสอบค่า
-          if NOT "%STATUS%"=="OK" (
-            echo ❌ Quality Gate failed with status %STATUS%
-          exit /b 1
-          ) else (
-          echo ✅ Quality Gate passed
-          )
+          if ($result.projectStatus.status -ne "OK") {
+              Write-Error "❌ Quality Gate failed with status $($result.projectStatus.status)"
+          exit 1
+          } else {
+              Write-Output "✅ Quality Gate passed"
+          }
