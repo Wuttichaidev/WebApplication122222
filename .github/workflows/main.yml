@@ -77,25 +77,18 @@ jobs:
       - name: Read status from result.json
         shell: cmd
         run: |
-          setlocal enabledelayedexpansion
-          set STATUS=NOT_FOUND
-
-          for /F "tokens=2 delims=:" %%a in ('findstr status result.json') do (
-              set STATUS=%%a
-              set STATUS=!STATUS: =!
-              set STATUS=!STATUS:"=!
-              goto afterLoop
-          )
-
-          :afterLoop
-          echo Project Status = !STATUS!
-
-          if "!STATUS!"=="OK" (
-              echo Quality Gate PASSED
-          ) else (
-              echo Quality Gate FAILED
+          REM อ่านไฟล์ JSON และตรวจสอบ projectStatus.status
+          for /f "delims=" %%i in (status.json) do set "json_content=%%i"
+          echo Checking projectStatus...
+          
+          REM ตรวจสอบว่า projectStatus.status เป็น OK หรือไม่
+          echo %json_content% | findstr /C:"\"projectStatus\":{\"status\":\"OK\"" >nul
+          if %errorlevel% != 0 (
+              echo ❌ Project status is not OK! Stopping workflow...
               exit /b 1
           )
           
+          echo ✅ Project status is OK, continuing...
+            
           
           
