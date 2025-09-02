@@ -50,8 +50,7 @@ jobs:
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
-
-      - run: echo "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("${{ secrets.SONAR_TOKEN }}"))
+      - run: echo "${{ secrets.SONAR_TOKEN }}"
       - name: Build and analyze
         shell: powershell
         run: |
@@ -80,7 +79,7 @@ jobs:
           }
 
           $response = Invoke-RestMethod -Uri "http://localhost:9000/api/qualitygates/project_status?projectKey=$encodedProjectKey" -Headers $headers
-
+          
           $status = $response.projectStatus.status
 
           if ($status -ne "OK") {
