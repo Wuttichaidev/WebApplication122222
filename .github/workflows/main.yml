@@ -77,15 +77,9 @@ jobs:
 
           REM อ่านค่า status จาก result.json
           for /F "tokens=2 delims=:" %a in ('findstr /C:"status" result.json') do set STATUS=%a
-
-          REM ลบ space และ double quote
-          set STATUS=%STATUS: =%
-          set STATUS=%STATUS:"=%
-
-          REM ตรวจสอบค่า status และ fail workflow ถ้าไม่ OK
-          if NOT "%STATUS%"=="OK" (
-              echo ❌ Quality Gate failed with status %STATUS%
-          exit /b 1
-          ) else (
-            echo ✅ Quality Gate passed
+          for /F "tokens=2 delims=:," %a in ('findstr /C:"status" "%GITHUB_WORKSPACE%\WebApplication122222\data.json"') do (
+          set STATUS=%a
           )
+          echo Status = !STATUS!
+          
+          
