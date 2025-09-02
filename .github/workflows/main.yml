@@ -80,6 +80,6 @@ jobs:
           for /F "tokens=2 delims=:," %a in ('findstr /C:"status" "%GITHUB_WORKSPACE%\WebApplication122222\data.json"') do (
           set STATUS=%a
           )
-          echo Status = !STATUS!
+          echo "{{STATUS}}"
           
           
