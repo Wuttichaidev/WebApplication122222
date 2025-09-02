@@ -72,7 +72,7 @@ jobs:
 
 
           $projectKey = "github-action"
-          $encodedProjectKey = [System.Web.HttpUtility]::UrlEncode($projectKey)
+          $encodedProjectKey = [System.Web.HttpUtility]::UrlEncode("${{ secrets.SONAR_TOKEN }}")
 
           $headers = @{
             Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("${{ secrets.SONAR_TOKEN }}"))
