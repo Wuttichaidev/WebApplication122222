@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Any;
 using System.Xml.Linq;
 
 namespace WebApplication122222.Controllers
@@ -24,17 +25,19 @@ namespace WebApplication122222.Controllers
         {
             try
             {
-                var name = 123; 
+                var name = 123;
                 "".Equals(name);
                 var test = "";
+                OpenApiString openApiString = new OpenApiString("test"); // Fixed CS0029
+                AnyType anyType = openApiString.AnyType; // If you need the AnyType value
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while getting the weather forecast.");
             }
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            { 
-            Date = DateTime.Now.AddDays(index),
+            {
+                Date = DateTime.Now.AddDays(index),
                 TemperatureC = Random.Shared.Next(-20, 55),
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
