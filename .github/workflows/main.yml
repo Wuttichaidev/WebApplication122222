@@ -78,7 +78,7 @@ jobs:
             Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("${{ secrets.SONAR_TOKEN }}"))
           }
 
-          $response = Invoke-RestMethod -Uri "$server/api/qualitygates/project_status?projectKey=$encodedProjectKey" -Headers $headers
+          $response = Invoke-RestMethod -Uri "http://localhost:9000/api/qualitygates/project_status?projectKey=$encodedProjectKey" -Headers $headers
 
           $status = $response.projectStatus.status
 
