@@ -54,10 +54,10 @@ jobs:
         shell: cmd
         run: |
           REM เรียก API ตรวจสอบ token ก่อน
-          curl -u %SONAR_TOKEN%: http://localhost:9000/api/authentication/validate
+          curl -u sqp_d3aa6eec72e370fd4ec9232ddfc78eab6372fc54: http://localhost:9000/api/authentication/validate
 
           REM ตรวจสอบ Quality Gate
-          curl -s -u %SONAR_TOKEN%: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
+          curl -s -u sqp_d3aa6eec72e370fd4ec9232ddfc78eab6372fc54: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
 
           REM อ่าน status จากไฟล์ JSON
           findstr /C:"\"status\"" result.json
