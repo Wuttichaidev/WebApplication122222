@@ -11,9 +11,8 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-    app.UseSwagger();
-    app.UseSwaggerUI();
-
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
@@ -21,4 +20,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.RunAsync();
+// Fix for CS4014: Await the RunAsync call in an async Main method
+await app.RunAsync();
