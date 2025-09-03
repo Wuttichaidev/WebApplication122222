@@ -92,14 +92,18 @@ jobs:
       - name: Build Docker image
         run: docker build -t aspnet6-api .
 
-      - name: Stop old container (PowerShell)
-        shell: pwsh
+      - name: Stop old container (CMD)
+        shell: cmd
         run: |
-          $container = docker ps -q -f name=aspnet6-api-container
-          if ($container) {
-              docker stop $container
-              docker rm $container
-          }
+          @echo off
+          REM ตรวจสอบ container เก่าที่รันอยู่
+          docker ps -q -f name=aspnet6-api-container > temp.txt
+          for /f %%i in (temp.txt) do (
+              echo Stopping container %%i
+              docker stop %%i
+              docker rm %%i
+          )
+          del temp.txt
       # 3️⃣ Run container (optional, for testing)
       - name: Run container
         run: |
