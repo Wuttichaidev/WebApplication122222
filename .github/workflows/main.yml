@@ -84,33 +84,21 @@ jobs:
       runs-on: self-hosted  
 
       steps:
-        # 1️⃣ Checkout code
-        - name: Checkout repository
-          uses: actions/checkout@v3
-  
-        # 2️⃣ Setup .NET 6 SDK
-        - name: Setup .NET
-          uses: actions/setup-dotnet@v3
-          with:
-            dotnet-version: 6.0.x
-            dotnet-install-dir: ${{ runner.temp }}/dotnet
-  
-        # 3️⃣ Build project (optional)
-        - name: Build project
-          run: dotnet build --configuration Release
-  
-        # 4️⃣ Build Docker image
-        - name: Build Docker image
-          run: |
-            docker build -t aspnet6-api .
-  
-        # 5️⃣ Run container (optional, for testing)
-        - name: Run container
-          run: |
-            docker run -d -p 8080:80 --name aspnet6-api-container aspnet6-api
-            
-        # 6️⃣ Check logs (optional)
-        - name: Show container logs
-          run: docker logs aspnet6-api-container
+         # 1️⃣ Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2️⃣ Build Docker image
+      - name: Build Docker image
+        run: docker build -t aspnet6-api .
+
+      # 3️⃣ Run container (optional, for testing)
+      - name: Run container
+        run: |
+          docker run -d -p 7070:80 --name aspnet6-api-container aspnet6-api
+
+      # 4️⃣ Check container logs
+      - name: Show container logs
+        run: docker logs aspnet6-api-container
           
           
