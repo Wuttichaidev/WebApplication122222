@@ -93,6 +93,14 @@ jobs:
       - name: Build Docker image
         run: docker build -t aspnet6-api .
 
+      # 2️⃣ Stop and remove old container if exists
+      - name: Stop old container
+        run: |
+          if [ $(docker ps -q -f name=aspnet6-api-container) ]; then
+            docker stop aspnet6-api-container
+            docker rm aspnet6-api-container
+          fi
+
       # 3️⃣ Run container (optional, for testing)
       - name: Run container
         run: |
