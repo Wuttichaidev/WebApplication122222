@@ -1,6 +1,6 @@
 name: GitHub Actions Demo
 run-name: ${{ github.actor }} กำลังทดสอบ GitHub Actions 🚀 
-on: [push]
+on: [push] 
 
 jobs:
   Explore-GitHub-Actions:  
