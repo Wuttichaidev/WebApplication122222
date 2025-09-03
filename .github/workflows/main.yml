@@ -1,39 +1,25 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} กำลังทดสอบ GitHub Actions 🚀 
-on: [push]
-
+name: GitHub Actions start
+on: [push] 
 jobs:
-  Explore-GitHub-Actions:
+  Explore-GitHub-Actions:  
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 งานถูกเรียกใช้งานโดยอัตโนมัติจากเหตุการณ์ ${{ github.event_name }}"
-      - run: echo "🐧 งานนี้กำลังทำงานบนเซิร์ฟเวอร์ ${{ runner.os }} ที่โฮสต์โดย GitHub!"
-      - run: echo "🔎 ชื่อสาขาของคุณคือ ${{ github.ref }} และที่เก็บข้อมูลของคุณคือ ${{ github.repository }}"
+      - run: echo "Start github action..."
 
-      # Checkout repo
-      - name: ตรวจสอบรหัสที่เก็บข้อมูล
-        uses: actions/checkout@v4
-
-      - run: echo "💡 รีพอริทอรี ${{ github.repository }} ได้ถูกโคลนไปยังรันเนอร์แล้ว"
-      - run: echo "🖥️ เวิร์กโฟลว์พร้อมที่จะทดสอบโค้ดของคุณบนตัวรันเนอร์แล้ว"
-      - name: รายชื่อไฟล์ในที่เก็บ
-        run: |
-          ls ${{ github.workspace }}
-
-  deploy:
-    needs: Explore-GitHub-Actions
+  SonarQubeScan:
+    needs: Explore-GitHub-Actions 
     runs-on: self-hosted   # เปลี่ยนเป็น self-hosted runner ของคุณ
     environment:
       name: production
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: 'zulu' # Alternative distribution options are available.
+          distribution: 'zulu'
       - name: Cache SonarQube packages
         uses: actions/cache@v4
         with:
@@ -50,12 +36,69 @@ jobs:
       - name: Install SonarQube scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
         shell: powershell
-        run: |
+        run: | 
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
       - name: Build and analyze
-        shell: powershell    
+        shell: cmd
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"github-action" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="http://localhost:9000"
-          dotnet build
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          
+          REM เรียก API ตรวจสอบ token ก่อน
+          curl -u ${{ secrets.SONAR_TOKEN }}: http://localhost:9000/api/authentication/validate
+
+          REM เพิ่ม path ของ local scanner
+          set PATH=.sonar\scanner;%PATH%
+          REM เริ่ม scan
+          dotnet-sonarscanner begin /k:"github-action" /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.host.url=http://localhost:9000
+
+          REM Build project
+          dotnet build /warnaserror
+          
+          REM จบ scan
+          dotnet-sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
+          
+
+      - name: Genarate json file
+        shell: cmd
+        run: | 
+          curl -s -u ${{ secrets.SONAR_TOKEN }}: "http://localhost:9000/api/qualitygates/project_status?projectKey=github-action" > result.json
+          findstr /C:"\"status\"" result.json
+          
+      - name: Read status from result.json
+        shell: cmd
+        run: |
+          REM อ่านไฟล์ JSON และตรวจสอบ projectStatus.status
+          for /f "delims=" %%i in (result.json) do set "json_content=%%i"
+          echo Checking projectStatus...
+          
+          REM ตรวจสอบว่า projectStatus.status เป็น OK หรือไม่
+          echo %json_content% | findstr /C:"\"projectStatus\":{\"status\":\"OK\"" >nul
+          echo 
+          if %errorlevel% neq 0 (
+              echo ❌ Project status is not OK! Stopping workflow...
+              exit /b 1
+          )        
+          echo ✅ Project status is OK, continuing...
+  deploy:
+      needs: SonarQubeScan
+      runs-on: self-hosted  
+
+      steps:
+         # 1️⃣ Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2️⃣ Build Docker image
+      - name: Build Docker image
+        run: docker build -t aspnet6-api .
+
+      # 3️⃣ Run container (optional, for testing)
+      - name: Run container
+        run: |
+          docker run -d -p 7070:80 --name aspnet6-api-container aspnet6-api
+
+      # 4️⃣ Check container logs
+      - name: Show container logs
+        run: docker logs aspnet6-api-container
+          
+          
