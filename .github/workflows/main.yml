@@ -1,13 +1,14 @@
 name: GitHub Actions start
+run-name: GitHub Actions
 on: [push] 
 jobs:
-  Explore-GitHub-Actions:  
+  GitHub-Actions:  
     runs-on: ubuntu-latest
     steps:
       - run: echo "Start github action..."
 
   SonarQubeScan:
-    needs: Explore-GitHub-Actions 
+    needs: GitHub-Actions 
     runs-on: self-hosted   # เปลี่ยนเป็น self-hosted runner ของคุณ
     environment:
       name: production
