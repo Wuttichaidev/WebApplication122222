@@ -95,7 +95,7 @@ jobs:
 
       - name: Stop old container (CMD)
         run: |
-            $container = docker ps -q -f name=aspnet6-api-container
+            $container = docker ps -a -q -f name=aspnet6-api-container
             if ($container) {
               Write-Host "Stopping and removing container $container"
               docker stop $container
