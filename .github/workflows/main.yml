@@ -1,23 +1,12 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} กำลังทดสอบ GitHub Actions 🚀 
+name: GitHub Actions start
 on: [push] 
-
 jobs:
   Explore-GitHub-Actions:  
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 งานถูกเรียกใช้งานโดยอัตโนมัติจากเหตุการณ์ ${{ github.event_name }}"
-      - run: echo "🐧 งานนี้กำลังทำงานบนเซิร์ฟเวอร์ ${{ runner.os }} ที่โฮสต์โดย GitHub!" 
-      - run: echo "🔎 ชื่อสาขาของคุณคือ ${{ github.ref }} และที่เก็บข้อมูลของคุณคือ ${{ github.repository }}"
-      - name: ตรวจสอบรหัสที่เก็บข้อมูล
-        uses: actions/checkout@v4
-      - run: echo "💡 รีพอริทอรี ${{ github.repository }} ได้ถูกโคลนไปยังรันเนอร์แล้ว"
-      - run: echo "🖥️ เวิร์กโฟลว์พร้อมที่จะทดสอบโค้ดของคุณบนตัวรันเนอร์แล้ว" 
-      - name: รายชื่อไฟล์ในที่เก็บ
-        run: | 
-          ls ${{ github.workspace }} 
+      - run: echo "Start github action..."
 
-  deploy:
+  SonarQubeScan:
     needs: Explore-GitHub-Actions 
     runs-on: self-hosted   # เปลี่ยนเป็น self-hosted runner ของคุณ
     environment:
@@ -88,9 +77,39 @@ jobs:
           if %errorlevel% neq 0 (
               echo ❌ Project status is not OK! Stopping workflow...
               exit /b 1
-          )
-          
+          )        
           echo ✅ Project status is OK, continuing...
+  deploy:
+      needs: SonarQubeScan
+      runs-on: self-hosted  
+
+      steps:
+        # 1️⃣ Checkout code
+        - name: Checkout repository
+          uses: actions/checkout@v3
+  
+        # 2️⃣ Setup .NET 6 SDK
+        - name: Setup .NET
+          uses: actions/setup-dotnet@v3
+          with:
+            dotnet-version: 6.0.x
+  
+        # 3️⃣ Build project (optional)
+        - name: Build project
+          run: dotnet build --configuration Release
+  
+        # 4️⃣ Build Docker image
+        - name: Build Docker image
+          run: |
+            docker build -t aspnet6-api .
+  
+        # 5️⃣ Run container (optional, for testing)
+        - name: Run container
+          run: |
+            docker run -d -p 8080:80 --name aspnet6-api-container aspnet6-api
             
+        # 6️⃣ Check logs (optional)
+        - name: Show container logs
+          run: docker logs aspnet6-api-container
           
           
