@@ -93,6 +93,7 @@ jobs:
           uses: actions/setup-dotnet@v3
           with:
             dotnet-version: 6.0.x
+            dotnet-install-dir: ${{ runner.temp }}/dotnet
   
         # 3️⃣ Build project (optional)
         - name: Build project
