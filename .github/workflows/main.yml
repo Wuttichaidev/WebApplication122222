@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Start Docker Desktop
+      - name: Start Docker Desktop 
         shell: powershell
         run: Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 
