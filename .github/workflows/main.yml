@@ -8,7 +8,7 @@ jobs:
 
   SonarQubeScan:
     needs: Explore-GitHub-Actions 
-    runs-on: self-hosted   # เปลี่ยนเป็น self-hosted runner ของคุณ
+    runs-on: self-hosted
     environment:
       name: production
     steps:
@@ -84,17 +84,15 @@ jobs:
       runs-on: self-hosted  
 
       steps:
-         # 1️⃣ Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Build Docker image
       - name: Build Docker image
         run: docker build -t aspnet6-api .
 
       - name: Stop old container (CMD)
         run: |
-            $container = docker ps -a -q -f name=aspnet6-api-container
+            $container = docker ps -a -f name=aspnet6-api-container
             if ($container) {
               Write-Host "Stopping and removing container $container"
               docker stop $container
@@ -102,13 +100,10 @@ jobs:
             } else {
                 Write-Host "No container found, nothing to remove."
             }
-      # 3️⃣ Run container (optional, for testing)
       - name: Run container
         run: |
           docker run -d -p 7070:80 --name aspnet6-api-container aspnet6-api
 
-      # 4️⃣ Check container logs
-      - name: Show container logs
-        run: docker logs aspnet6-api-container
+
           
           
