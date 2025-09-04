@@ -40,9 +40,9 @@ jobs:
       
       - name: Run ZAP baseline scan
         run: |
-          docker run --rm -v ${{ github.workspace }}/zap-reports:/zap/wrk:rw -u zap owasp/zap2docker-stable \
+          docker run --rm -v ${{ github.workspace }}/zap-reports:/zap/wrk:rw -u zap owasp/zap2docker-weekly \
             zap-baseline.py \
-            -t http://host.docker.internal:7070/swagger/v1/swagger.json \
+            -t http://host.docker.internal:8080/swagger/v1/swagger.json \
             -r report.html
 
       - name: Upload ZAP report
