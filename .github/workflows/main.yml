@@ -6,7 +6,7 @@ jobs:
     steps:
       - run: echo "Start github action..."
   ZapScan:
-      needs: Explore-GitHub-Actions
+      needs: Explore-GitHub-Actions 
       runs-on: self-hosted  
 
       steps: 
