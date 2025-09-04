@@ -42,11 +42,8 @@ jobs:
       
       - name: Run ZAP baseline scan
         run: |
-          docker run --rm -v ${{ github.workspace }}/zap-reports:/zap/wrk:rw \
-          ghcr.io/zaproxy/zaproxy:stable \
-          zap-baseline.py \
-          -t http://host.docker.internal:8080/swagger/v1/swagger.json \
-          -r /zap/wrk/report.html
+          docker run --rm -v ${{ github.workspace }}/zap-reports:/zap/wrk:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://host.docker.internal:8080/swagger/v1/swagger.json -r /zap/wrk/report.html
+
 
 
 
