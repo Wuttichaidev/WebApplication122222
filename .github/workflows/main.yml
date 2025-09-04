@@ -37,13 +37,16 @@ jobs:
       - name: Create report folder
         run: mkdir -p zap-reports
 
+      - name: Pull ZAP Docker image
+        run: docker pull ghcr.io/zaproxy/zaproxy:stable
       
       - name: Run ZAP baseline scan
         run: |
-          docker run --rm -v ${{ github.workspace }}/zap-reports:/zap/wrk:rw -u zap owasp/zap2docker-weekly \
+           docker run --rm -v ${{ github.workspace }}/zap-reports:/zap/wrk:rw \
+            ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py \
-            -t http://host.docker.internal:8080/swagger/v1/swagger.json \
-            -r report.html
+            -t http://host.docker.internal:7070/swagger/v1/swagger.json \
+            -r /zap/wrk/report.html
 
       - name: Upload ZAP report
         uses: actions/upload-artifact@v4
