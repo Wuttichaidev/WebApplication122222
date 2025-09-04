@@ -3,7 +3,7 @@ on: [push]
 jobs:
   Explore-GitHub-Actions:  
     runs-on: ubuntu-latest
-    steps:
+    steps: 
       - run: echo "Start github action..."
   ZapScan:
       needs: Explore-GitHub-Actions   
