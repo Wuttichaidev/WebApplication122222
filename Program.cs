@@ -16,7 +16,24 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection(); 
  
-app.UseAuthorization(); 
+app.UseAuthorization();
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        var headers = context.Response.Headers;
+
+        if (!headers.ContainsKey("X-Content-Type-Options"))
+            headers.Add("X-Content-Type-Options", "nosniff");
+
+        if (!headers.ContainsKey("Cross-Origin-Resource-Policy"))
+            headers.Add("Cross-Origin-Resource-Policy", "same-origin");
+
+        return Task.CompletedTask;
+    });
+
+    await next();
+});
 
 app.MapControllers();
 
