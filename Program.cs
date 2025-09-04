@@ -21,8 +21,11 @@ app.Use(async (context, next) =>
 
     await next();
 });
-app.UseSwagger();
-app.UseSwaggerUI();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection(); 
  
