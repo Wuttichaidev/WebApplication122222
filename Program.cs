@@ -10,30 +10,24 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        context.Response.Headers["Cross-Origin-Resource-Policy"] = "same-origin";
+        return Task.CompletedTask;
+    });
 
+    await next();
+});
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection(); 
  
 app.UseAuthorization();
-app.Use(async (context, next) =>
-{
-    context.Response.OnStarting(() =>
-    {
-        var headers = context.Response.Headers;
 
-        if (!headers.ContainsKey("X-Content-Type-Options"))
-            headers.Add("X-Content-Type-Options", "nosniff");
-
-        if (!headers.ContainsKey("Cross-Origin-Resource-Policy"))
-            headers.Add("Cross-Origin-Resource-Policy", "same-origin");
-
-        return Task.CompletedTask;
-    });
-
-    await next();
-});
 
 app.MapControllers();
 
