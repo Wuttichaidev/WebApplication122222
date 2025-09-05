@@ -64,8 +64,6 @@ jobs:
   SonarQubeScan:
     needs: ZapScan
     runs-on: self-hosted
-    environment:
-      name: production
     steps:
       - uses: actions/checkout@v4
         with:
@@ -137,7 +135,8 @@ jobs:
   deploy:
       needs: SonarQubeScan
       runs-on: self-hosted  
-
+      environment:
+        name: production
       steps:
       - name: Checkout repository
         uses: actions/checkout@v4
