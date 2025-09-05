@@ -154,7 +154,7 @@ jobs:
             }
       - name: Run container
         run: |
-          docker run -d -p 7070:80 --name aspnet6-api-container aspnet6-api
+          docker run -d -p 7070:80 -p 8443:443 --name aspnet6-api-container aspnet6-api
 
 
           
