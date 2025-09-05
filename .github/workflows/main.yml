@@ -17,6 +17,9 @@ jobs:
         shell: powershell
         run: Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 
+      - name: Delay 30 seconds
+        run: sleep 30
+        
       - name: Build Docker image
         run: docker build -t aspnet6-api .
 
